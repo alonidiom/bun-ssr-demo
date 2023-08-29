@@ -1,15 +1,9 @@
+import { BUILD_DIR } from "build";
 import { MatchedRoute, Server } from "bun";
 import { ServerContext } from "context";
 import { FunctionComponent } from "react";
 import { renderToReadableStream } from "react-dom/server";
 import { PageComponentProps } from "types";
-
-const BUILD_DIR = "build";
-
-await Bun.build({
-  entrypoints: ["./src/index.ts"],
-  outdir: `./${BUILD_DIR}`,
-});
 
 const router = new Bun.FileSystemRouter({
   style: "nextjs",

@@ -7,12 +7,13 @@ function TodoList() {
     "/api/todos"
   );
   return (
-    <ul>
+    <ul className="bg-gray-200 rounded-lg p-4 max-w-lg w-full">
       {todos.map((todo) => (
         <li key={todo.id}>
-          <label>
+          <label className="flex items-center gap-1">
             <input
               type="checkbox"
+              className="rounded text-green-500"
               data-id={todo.id}
               defaultChecked={todo.completed}
             />
@@ -32,8 +33,8 @@ export default function Root() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>My page</title>
       </head>
-      <body>
-        <h1>My page</h1>
+      <body className="flex flex-col gap-3 items-center">
+        <h1 className="font-bold text-3xl">My page</h1>
         <Suspense fallback={null}>
           <TodoList />
         </Suspense>
