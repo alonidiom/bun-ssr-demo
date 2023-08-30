@@ -2,6 +2,10 @@
   "name": "bun-jsx-server",
   "module": "index.tsx",
   "type": "module",
+  "scripts": {
+    "start": "bun run index.tsx",
+    "dev": "bun run --watch index.tsx"
+  },
   "devDependencies": {
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",

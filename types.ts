@@ -3,7 +3,7 @@ import { MatchedRoute } from "bun";
 export type PageComponentProps = Pick<
   MatchedRoute,
   "kind" | "name" | "params" | "pathname" | "query"
->;
+> & { request: Request };
 
 export type ApiHandler = (
   match: MatchedRoute,
