@@ -21,7 +21,7 @@ async function renderPage(
   const origin = `${protocol}://${hostname}:${port}`;
   const props = { kind, name, params, pathname, query, request };
   const stream = await renderToReadableStream(
-    <ServerContext.Provider value={{ origin, cache: new Map() }}>
+    <ServerContext.Provider value={{ origin, request, cache: new Map() }}>
       <Component {...props} />
     </ServerContext.Provider>,
     !request.headers.has("hx-request")
@@ -44,12 +44,12 @@ Bun.serve({
     const res = router.match(request);
     if (res) {
       const module = await import(res.filePath);
-      if (module.default) {
-        return renderPage(module.default, server, request, res);
-      }
-      const apiHandler = module[request.method.toUpperCase()];
-      if (!apiHandler) return new Response("", { status: 405 });
       try {
+        if (module.default) {
+          return renderPage(module.default, server, request, res);
+        }
+        const apiHandler = module[request.method.toUpperCase()];
+        if (!apiHandler) return new Response("", { status: 405 });
         const apiResponse = await apiHandler(res, request);
         return new Response(JSON.stringify(apiResponse), {
           headers: { "content-type": "application/json" },
