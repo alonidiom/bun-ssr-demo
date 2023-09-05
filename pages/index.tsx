@@ -1,24 +1,15 @@
 import { Suspense } from "react";
-import { useApi } from "use";
+import { getTodos } from "services/todos";
+import { Todo, Document } from "ui";
+import { useAsyncValue } from "use";
 
 function TodoList() {
-  const todos = useApi<"GET", typeof import("pages/api/todos")>(
-    "GET",
-    "/api/todos"
-  );
+  const todos = useAsyncValue(getTodos);
   return (
     <ul className="bg-gray-200 rounded-lg p-4 max-w-lg w-full">
       {todos.map((todo) => (
         <li key={todo.id}>
-          <label className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              className="rounded text-green-500"
-              data-id={todo.id}
-              defaultChecked={todo.completed}
-            />
-            {todo.title}
-          </label>
+          <Todo {...todo} />
         </li>
       ))}
     </ul>
@@ -27,18 +18,32 @@ function TodoList() {
 
 export default function Root() {
   return (
-    <html>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>My page</title>
-      </head>
-      <body className="flex flex-col gap-3 items-center">
-        <h1 className="font-bold text-3xl">My page</h1>
-        <Suspense fallback={null}>
-          <TodoList />
-        </Suspense>
-      </body>
-    </html>
+    <Document title="My todo list" className="flex flex-col gap-3 items-center">
+      <h1 className="font-bold text-3xl">My todo list</h1>
+      <form
+        hx-post="/api/todos"
+        hx-target="next ul"
+        hx-swap="afterbegin"
+        className="flex gap-2 max-w-lg w-full"
+        {...{
+          "hx-on::after-request": "this.reset()",
+        }}
+      >
+        <input
+          type="text"
+          name="title"
+          className="rounded-lg p-2 border border-gray-300 flex-1"
+          placeholder="What needs to be done?"
+          required
+        />
+
+        <button type="submit" className="bg-blue-500 text-white rounded-lg p-2">
+          Add
+        </button>
+      </form>
+      <Suspense fallback={null}>
+        <TodoList />
+      </Suspense>
+    </Document>
   );
 }

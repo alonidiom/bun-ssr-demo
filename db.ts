@@ -1,4 +1,10 @@
-export const todos = [
+export type Todo = {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+export const todos: Todo[] = [
   {
     id: 1,
     title: "Learn React",

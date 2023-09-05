@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 export const ServerContext = createContext<{
   origin: string;
   cache: Map<string, any>;
+  request: Request;
 } | null>(null);
 
 export const useServerContext = () => {

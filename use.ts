@@ -1,4 +1,5 @@
 import { useServerContext } from "context";
+import { useId } from "react";
 import { APIResponse, HttpMethod, HttpModule } from "types";
 
 interface PendingPromise<T> extends Promise<T> {
@@ -46,26 +47,17 @@ export function use<T>(promise: PromiseEx<T>) {
   }
 }
 
-export async function api<
-  Method extends HttpMethod,
-  Module extends HttpModule<Method>
->(responsePromise: Promise<Response>) {
-  const response = await responsePromise;
-  if (response.ok) {
-    const data = await response.json();
-    return data as APIResponse<Method, Module>;
-  }
-  throw new Error(response.statusText);
-}
+const requestCache = new WeakMap<Request, Record<string, Promise<any>>>();
 
-export function useApi<
-  Method extends HttpMethod,
-  Module extends HttpModule<Method>
->(method: Method, url: string) {
-  const { origin, cache } = useServerContext();
-  const key = `${method}@->${url}`;
-  if (!cache.has(key)) {
-    cache.set(key, api<Method, Module>(fetch(`${origin}${url}`)));
+export function useAsyncValue<T>(promiseFactory: () => Promise<T>): T {
+  const { request } = useServerContext();
+  const cacheKey = useId();
+  if (!requestCache.has(request)) {
+    requestCache.set(request, {});
   }
-  return use(cache.get(key)!) as APIResponse<Method, Module>;
+  const cache = requestCache.get(request)!;
+  if (!cache[cacheKey]) {
+    cache[cacheKey] = promiseFactory();
+  }
+  return use(cache[cacheKey]);
 }
